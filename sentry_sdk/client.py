@@ -238,8 +238,12 @@ class _Client(object):
         if exc_info is None and log_record is None:
             return False
 
-        type_name = get_type_name(exc_info[0])
-        full_name = "%s.%s" % (exc_info[0].__module__, type_name)
+        if exc_info is not None:
+            type_name = get_type_name(exc_info[0])
+            full_name = "%s.%s" % (exc_info[0].__module__, type_name)
+        else:
+            type_name = None
+            full_name = None
 
         for errcls in self.options["ignore_errors"]:
             # String types are matched against the type name in the
