@@ -251,7 +251,7 @@ class _Client(object):
             if isinstance(errcls, string_types):
                 if errcls == full_name or errcls == type_name:
                     return True
-                elif errcls in log_record.message:
+                elif log_record is not None and errcls in log_record.message:
                     return True
             elif issubclass(exc_info[0], errcls):
                     return True
