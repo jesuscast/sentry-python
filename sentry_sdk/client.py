@@ -231,22 +231,25 @@ class _Client(object):
 
     def _is_ignored_error(self, event, hint):
         # type: (Event, Hint) -> bool
+        log_record = hint.get("log_record")
+
         exc_info = hint.get("exc_info")
-        if exc_info is None:
+
+        if exc_info is None and log_record is None:
             return False
 
-        error = exc_info[0]
-        error_type_name = get_type_name(exc_info[0])
-        error_full_name = "%s.%s" % (exc_info[0].__module__, error_type_name)
+        type_name = get_type_name(exc_info[0])
+        full_name = "%s.%s" % (exc_info[0].__module__, type_name)
 
-        for ignored_error in self.options["ignore_errors"]:
+        for errcls in self.options["ignore_errors"]:
             # String types are matched against the type name in the
             # exception only
-            if isinstance(ignored_error, string_types):
-                if ignored_error == error_full_name or ignored_error == error_type_name:
+            if isinstance(errcls, string_types):
+                if errcls == full_name or errcls == type_name:
                     return True
-            else:
-                if issubclass(error, ignored_error):
+                elif errcls in log_record.message:
+                    return True
+            elif issubclass(exc_info[0], errcls):
                     return True
 
         return False
